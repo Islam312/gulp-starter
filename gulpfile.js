@@ -71,7 +71,7 @@ const pug = () => {
 };
 //*========================== Обработка SASS
 const scss = () => {
-  return src(path.source.scss)
+  return src(path.source.scss, { sourcemaps: true })
     .pipe(plumber())
     .pipe(sass())
     .pipe(
@@ -81,14 +81,14 @@ const scss = () => {
       })
     )
     .pipe(groupMediaQuaries())
-    .pipe(dest(path.build.css))
+    .pipe(dest(path.build.css, { sourcemaps: true }))
     .pipe(cleanCss())
     .pipe(
       rename({
         extname: '.min.css',
       })
     )
-    .pipe(dest(path.build.css))
+    .pipe(dest(path.build.css, { sourcemaps: true }))
     .pipe(browserSync.stream());
 };
 //*=========================== Обработка JavaScript
