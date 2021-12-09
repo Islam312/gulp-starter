@@ -34,10 +34,18 @@ let plumber = require('gulp-plumber'),
 
 //* Переменные для компиляции пре-процессоров
 let pugs = require('gulp-pug'),
-  sass = require('gulp-sass')(require('sass'));
+  sass = require('gulp-sass')(require('sass')),
+  autoprefixer = require('gulp-autoprefixer'),
+  groupMediaQuaries = require('gulp-group-css-media-queries'),
+  cleanCss = require('gulp-clean-css'),
+  rename = require('gulp-rename');
+
+//* Переменные для JavaScript
+let babel = require('gulp-babel'),
+  webpack = require('webpack-stream');
 
 //* Функции обработки задач
-//* Server
+//* ========================== Server
 const server = () => {
   browserSync.init({
     server: {
@@ -49,7 +57,7 @@ const server = () => {
 };
 
 //*Обработка пре-процессоров
-//* Обработка PUG
+//* ==========================Обработка PUG
 const pug = () => {
   return src(path.source.pug)
     .pipe(plumber())
@@ -61,31 +69,59 @@ const pug = () => {
     .pipe(dest(path.build.html))
     .pipe(browserSync.stream());
 };
-//* Обработка SASS
+//*========================== Обработка SASS
 const scss = () => {
   return src(path.source.scss)
     .pipe(plumber())
     .pipe(sass())
+    .pipe(
+      autoprefixer({
+        overrideBrowserslist: ['last 5 versions'],
+        cascade: true,
+      })
+    )
+    .pipe(groupMediaQuaries())
+    .pipe(dest(path.build.css))
+    .pipe(cleanCss())
+    .pipe(
+      rename({
+        extname: '.min.css',
+      })
+    )
     .pipe(dest(path.build.css))
     .pipe(browserSync.stream());
 };
-
-//* Удаление директории
+//*=========================== Обработка JavaScript
+const js = () => {
+  return src(path.source.js)
+    .pipe(plumber())
+    .pipe(babel())
+    .pipe(
+      webpack({
+        mode: 'development',
+      })
+    )
+    .pipe(dest(path.build.js))
+    .pipe(browserSync.stream());
+};
+//*=========================== Удаление директории
 const clean = () => {
   return del(path.clean);
 };
 
-//* Наблюдение
+//*============================ Наблюдение
 const watcher = () => {
   watch([path.watch.pug], pug);
   watch([path.watch.scss], scss);
+  watch([path.watch.js], js);
 };
 
-//* Задачи
+//* ============================ Задачи
 exports.pug = pug;
 exports.scss = scss;
+exports.js = js;
 exports.watch = watcher;
 exports.clean = clean;
 
-//*Сборка
-exports.dev = series(clean, parallel(scss, pug), parallel(watcher, server));
+//*============================== Сборка
+exports.dev = series(clean, parallel(js, scss, pug), parallel(watcher, server));

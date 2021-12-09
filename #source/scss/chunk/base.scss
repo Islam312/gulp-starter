@@ -6,4 +6,7 @@ html{
 }
 ul {
   list-style: none;
+  @media (min-width: 768px) {
+      list-style-type: disc;
+  }
 }
