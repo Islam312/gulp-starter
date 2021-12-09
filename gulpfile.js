@@ -93,7 +93,7 @@ const scss = () => {
 };
 //*=========================== Обработка JavaScript
 const js = () => {
-  return src(path.source.js)
+  return src(path.source.js, { sourcemaps: true })
     .pipe(plumber())
     .pipe(babel())
     .pipe(
@@ -101,7 +101,7 @@ const js = () => {
         mode: 'development',
       })
     )
-    .pipe(dest(path.build.js))
+    .pipe(dest(path.build.js, { sourcemaps: true }))
     .pipe(browserSync.stream());
 };
 //*=========================== Удаление директории
