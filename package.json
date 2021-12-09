@@ -15,5 +15,14 @@
   "bugs": {
     "url": "https://github.com/Islam312/gulp-starter/issues"
   },
-  "homepage": "https://github.com/Islam312/gulp-starter#readme"
+  "homepage": "https://github.com/Islam312/gulp-starter#readme",
+  "devDependencies": {
+    "browser-sync": "^2.27.7",
+    "del": "^6.0.0",
+    "gulp": "^4.0.2",
+    "gulp-plumber": "^1.2.1",
+    "gulp-pug": "^5.0.0",
+    "gulp-sass": "^5.0.0",
+    "sass": "^1.44.0"
+  }
 }
