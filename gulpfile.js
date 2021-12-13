@@ -39,7 +39,8 @@ let pugs = require('gulp-pug'),
   groupMediaQuaries = require('gulp-group-css-media-queries'),
   cleanCss = require('gulp-clean-css'),
   rename = require('gulp-rename');
-
+//* Переменные для Image
+let imagemin = require('gulp-imagemin');
 //* Переменные для JavaScript
 let babel = require('gulp-babel'),
   webpack = require('webpack-stream');
@@ -91,6 +92,20 @@ const scss = () => {
     .pipe(dest(path.build.css, { sourcemaps: true }))
     .pipe(browserSync.stream());
 };
+//* ==========================Обработка Image
+const images = () => {
+  return src(path.source.img)
+    .pipe(
+      imagemin({
+        progressive: true,
+        svgoPlugins: [{ removeViewBox: false }],
+        interlaced: true,
+        optimizationLevel: 3,
+      })
+    )
+    .pipe(dest(path.build.img))
+    .pipe(browserSync.stream());
+};
 //*=========================== Обработка JavaScript
 const js = () => {
   return src(path.source.js, { sourcemaps: true })
@@ -113,15 +128,21 @@ const clean = () => {
 const watcher = () => {
   watch([path.watch.pug], pug);
   watch([path.watch.scss], scss);
+  watch([path.watch.img], images);
   watch([path.watch.js], js);
 };
 
 //* ============================ Задачи
 exports.pug = pug;
 exports.scss = scss;
+exports.images = images;
 exports.js = js;
 exports.watch = watcher;
 exports.clean = clean;
 
 //*============================== Сборка
-exports.dev = series(clean, parallel(js, scss, pug), parallel(watcher, server));
+exports.dev = series(
+  clean,
+  parallel(js, scss, pug, images),
+  parallel(watcher, server)
+);
