@@ -44,7 +44,8 @@ let imagemin = require('gulp-imagemin');
 //* Переменные для JavaScript
 let babel = require('gulp-babel'),
   webpack = require('webpack-stream');
-
+//* Переменные для Фотографий
+let imagemin = require('gulp-imagemin');
 //* Функции обработки задач
 //* ========================== Server
 const server = () => {
@@ -70,11 +71,19 @@ const pug = () => {
     .pipe(dest(path.build.html))
     .pipe(browserSync.stream());
 };
+
+//* ==========================Обработка IMAGES
+const images = () => {
+  return src(path.source.img)
+    .pipe(imagemin({}))
+    .pipe(dest(path.build.img))
+    .pipe(browserSync.stream());
+};
 //*========================== Обработка SASS
 const scss = () => {
   return src(path.source.scss, { sourcemaps: true })
     .pipe(plumber())
-    .pipe(sass())
+    .pipe(sass().on('error', sass.logError))
     .pipe(
       autoprefixer({
         overrideBrowserslist: ['last 5 versions'],
@@ -130,6 +139,7 @@ const watcher = () => {
   watch([path.watch.scss], scss);
   watch([path.watch.img], images);
   watch([path.watch.js], js);
+  watch([path.watch.img], images);
 };
 
 //* ============================ Задачи
@@ -137,6 +147,7 @@ exports.pug = pug;
 exports.scss = scss;
 exports.images = images;
 exports.js = js;
+exports.images = images;
 exports.watch = watcher;
 exports.clean = clean;
 
